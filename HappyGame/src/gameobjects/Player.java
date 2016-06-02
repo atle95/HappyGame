@@ -13,7 +13,12 @@ public class Player
   private int openingSpeed = 3;
   int radius;
 
-  public short control = 0;
+  public Boolean shiftPressed;
+  public Boolean wDown = false;
+  public Boolean aDown = false;
+  public Boolean sDown = false;
+  public Boolean dDown = false;
+  short control = 0;
   public double rotateRight = 0;
   public double rotateLeft = 0;
   double rotateSpeed = 10;
@@ -23,7 +28,7 @@ public class Player
   Double [] pentagonLayout;
   
   HappyGame game;
-  boolean isClientPlayer;
+  public boolean isClientPlayer;
   
   Player(HappyGame game, boolean isClientPlayer)
   {
@@ -88,27 +93,15 @@ public class Player
     if(isClientPlayer)
     {
     
+      if(wDown){ypos-= WALKINGSPEED;}
+      if(aDown){xpos-= WALKINGSPEED;}
+      if(sDown){ypos+= WALKINGSPEED;}
+      if(dDown){xpos+= WALKINGSPEED;}
       StackPane pane = game.getStackPane();
-      if((control & 0x80) == 0x80)
-      {
-        ypos-= WALKINGSPEED;
-        pane.setTranslateY(pane.getTranslateY()+WALKINGSPEED);
-      }
-      if((control & 0x40) == 0x40)
-      {
-        xpos-= WALKINGSPEED;
-        pane.setTranslateX(pane.getTranslateX()+WALKINGSPEED);
-      }
-      if((control & 0x20) == 0x20)
-      {
-        ypos+= WALKINGSPEED;
-        pane.setTranslateY(pane.getTranslateY()-WALKINGSPEED);
-        }
-      if((control & 0x10) == 0x10)
-      {
-        xpos+= WALKINGSPEED;
-        pane.setTranslateX(pane.getTranslateX()-WALKINGSPEED);
-      }
+      if(wDown){pane.setTranslateY(pane.getTranslateY()+WALKINGSPEED);}
+      if(aDown){pane.setTranslateX(pane.getTranslateX()+WALKINGSPEED);}
+      if(sDown){pane.setTranslateY(pane.getTranslateY()-WALKINGSPEED);}
+      if(dDown){pane.setTranslateX(pane.getTranslateX()-WALKINGSPEED);}
     }
     
     
@@ -144,5 +137,14 @@ public class Player
     }
     polyArr[4].setTranslateX(xpos);
     polyArr[4].setTranslateY(ypos);
+  }
+  
+  public short getControls()
+  {
+      if(wDown){control ^= 0x80;}
+      if(aDown){control ^= 0x40;}
+      if(sDown){control ^= 0x20;}
+      if(dDown){control ^= 0x10;}
+      return control;
   }
 }

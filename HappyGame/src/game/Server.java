@@ -19,6 +19,7 @@ public class Server
   private LinkedList<ServerWorker> allConnections = new LinkedList<ServerWorker>();
   Random r = new Random();
   HappyGame game;
+  boolean player2;
 
   public Server(int portNumber)
   {
@@ -58,7 +59,7 @@ public class Server
         ServerWorker worker = new ServerWorker(client);
         worker.start();
         allConnections.add(worker);
-        worker.send("ServerMaster says hello!");
+        worker.send("You have successfully connected to the server!");
         
         
       }
@@ -68,7 +69,7 @@ public class Server
         e.printStackTrace();
       }
 
-      broadcast("playerJoined at: "+System.nanoTime());
+//      broadcast("Player Joined at: "+System.currentTimeMillis() );
     }
   }
 
@@ -111,7 +112,6 @@ public class Server
       @Override
       public void run()
       {
-//        broadcast("hello?");
       }
     }, start, interval);
     

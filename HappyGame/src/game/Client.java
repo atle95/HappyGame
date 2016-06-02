@@ -1,8 +1,12 @@
 package game;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -23,12 +27,12 @@ public class Client
   public int screenWidth = 640;
   public int screenHeight = 400;
   Player player;
-//  HappyGame game;
+  HappyGame game;
 
   public Client(String host, int portNumber)
   {
     startNanoSec = System.nanoTime();
-    System.out.println("Starting Client: " + System.nanoTime());
+//    System.out.println("Starting Client: " + System.nanoTime());
 
     keyboard = new Scanner(System.in);
     
@@ -38,16 +42,20 @@ public class Client
     }
     
     listener = new ClientListener();
-    System.out.println("Client(): Starting listener = : " + listener);
+//    System.out.println("Client(): Starting listener = : " + listener);
     listener.start();
     
-    HappyGame game = new HappyGame();
+    game = new HappyGame();
 //    game.addPlayer(false);
-    game.addPlayer(false);
 //    game.addPlayer(false);
-    (new Thread(game)).start();
+//    game.addPlayer(false);
+//    write.println( startNanoSec + ": Starting Game" );
     
-    System.out.println("Number of Players: "+game.playerList.size());
+    Thread t = new Thread(game);
+        
+    t.start();
+    
+//    System.out.println("Number of Players: "+game.playerList.size());
     
     listenToUserRequests();
     closeAll();
@@ -77,7 +85,11 @@ public class Client
 
     try
     {
+      OutputStream os = clientSocket.getOutputStream();
+      OutputStreamWriter osw = new OutputStreamWriter(os);
+      BufferedWriter bw = new BufferedWriter(osw);
       write = new PrintWriter(clientSocket.getOutputStream(), true);
+//      write.println("Hello from Client!" + this.game.playerList.get(0).isClientPlayer);
     }
     catch (IOException e)
     {
@@ -87,8 +99,10 @@ public class Client
     }
     try
     {
-      reader = new BufferedReader(new InputStreamReader(
-      clientSocket.getInputStream()));
+      InputStream is = clientSocket.getInputStream();
+      InputStreamReader isr = new InputStreamReader(is);
+      BufferedReader br = new BufferedReader(isr);
+      reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
     }
     catch (IOException e)
     {
@@ -104,15 +118,17 @@ public class Client
   {
     while (true)
     {
-      String cmd = keyboard.nextLine();
-      System.out.println("doing "+cmd);
-      if (cmd == null) continue;
-      if (cmd.length() < 1) continue;
+//      String cmd = keyboard.nextLine();
+//      short cmd = game.getPlayerControl();
+//      if( cmd !=0 )
+//      System.out.println("doing "+cmd);
+//      if (cmd == null) continue;
+//      if (cmd.length() < 1) continue;
 
-      char c = cmd.charAt(0);
-      if (c == 'q') System.exit(0);;
+//      char c = cmd.charAt(0);
+//      if (c == 'q') System.exit(0);;
 
-      write.println(cmd);
+//      write.println(""+cmd);
     }
   }
 
@@ -165,7 +181,7 @@ public class Client
       System.exit(0);
     }
     
-    System.out.println("new Client(host, port);");
+//    System.out.println("new Client(host, port);");
     Client c = new Client(host, port);
     
     
@@ -189,8 +205,8 @@ public class Client
       {
 //        System.out.println("Client: listening to socket");
         String msg = reader.readLine();
-        
-        System.out.println( timeDiff() + ": " + msg);
+        System.out.print(msg);
+//        System.out.println( timeDiff() + ": " + msg);
 
       }
       catch (IOException e)

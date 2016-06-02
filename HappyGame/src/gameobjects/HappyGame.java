@@ -100,9 +100,12 @@ public class HappyGame extends Application implements Runnable
   
   public short getPlayerControl()
   {
-    return playerList.get(0).control;
+//    System.out.println(playerList.get(0).getControls());
+    return playerList.get(0).getControls();
+    
   }
-  //Quick workaround not kill the rest of the program
+  
+  //Quick workaround to not kill the rest of the program
   @Override
   public void run()
   {

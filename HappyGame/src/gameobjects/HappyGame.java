@@ -21,12 +21,12 @@ public class HappyGame extends Application implements Runnable
   ArrayList<GamePolygon> gamePolyList = new ArrayList<>();
   public ArrayList<Player> playerList = new ArrayList<>();
   Canvas background = new Canvas(1280, 800);
-  GraphicsContext gfx = background.getGraphicsContext2D();
+//  GraphicsContext gfx = background.getGraphicsContext2D();
   StackPane pane = new StackPane();
   public boolean paused = false;
   Random r = new Random();
-  public int screenWidth = 640;
-  public int screenHeight = 400;
+  public int screenWidth = 1280;
+  public int screenHeight = 800;
   int currentPlayers = 0;
   int pendingPlayers = 0;
   Scene gameScene;

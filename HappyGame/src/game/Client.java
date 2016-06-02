@@ -24,8 +24,8 @@ public class Client
   private long startNanoSec;
   private Scanner keyboard;
   private ClientListener listener;
-  public int screenWidth = 640;
-  public int screenHeight = 400;
+  public int screenWidth = 1280;
+  public int screenHeight = 800;
   Player player;
   HappyGame game;
 

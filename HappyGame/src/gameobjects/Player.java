@@ -10,23 +10,24 @@ public class Player
   public Polygon polyArr[] = new Polygon[5];
   int layoutDistance = 40;
   boolean opening = true;
-  public Boolean shiftPressed;
-  public Boolean wDown = false;
-  public Boolean aDown = false;
-  public Boolean sDown = false;
-  public Boolean dDown = false;
+  private int openingSpeed = 3;
+  int radius;
+
+  public short control = 0;
   public double rotateRight = 0;
   public double rotateLeft = 0;
   double rotateSpeed = 10;
+  
   double xpos;
   double ypos;
   Double [] pentagonLayout;
-  private int openingSpeed = 3;
-  HappyGame game;
-  int radius;
   
-  Player(HappyGame game)
+  HappyGame game;
+  boolean isClientPlayer;
+  
+  Player(HappyGame game, boolean isClientPlayer)
   {
+    this.isClientPlayer = isClientPlayer;
     this.game = game;
     Double unit = 20.0;
     radius = 20;
@@ -84,16 +85,31 @@ public class Player
     
     polyArr[1].setTranslateX(layoutDistance);
     
+    if(isClientPlayer)
+    {
     
-    if(wDown){ypos-= WALKINGSPEED;}
-    if(aDown){xpos-= WALKINGSPEED;}
-    if(sDown){ypos+= WALKINGSPEED;}
-    if(dDown){xpos+= WALKINGSPEED;}
-    StackPane pane = game.getStackPane();
-    if(wDown){pane.setTranslateY(pane.getTranslateY()+WALKINGSPEED);}
-    if(aDown){pane.setTranslateX(pane.getTranslateX()+WALKINGSPEED);}
-    if(sDown){pane.setTranslateY(pane.getTranslateY()-WALKINGSPEED);}
-    if(dDown){pane.setTranslateX(pane.getTranslateX()-WALKINGSPEED);}
+      StackPane pane = game.getStackPane();
+      if((control & 0x80) == 0x80)
+      {
+        ypos-= WALKINGSPEED;
+        pane.setTranslateY(pane.getTranslateY()+WALKINGSPEED);
+      }
+      if((control & 0x40) == 0x40)
+      {
+        xpos-= WALKINGSPEED;
+        pane.setTranslateX(pane.getTranslateX()+WALKINGSPEED);
+      }
+      if((control & 0x20) == 0x20)
+      {
+        ypos+= WALKINGSPEED;
+        pane.setTranslateY(pane.getTranslateY()-WALKINGSPEED);
+        }
+      if((control & 0x10) == 0x10)
+      {
+        xpos+= WALKINGSPEED;
+        pane.setTranslateX(pane.getTranslateX()-WALKINGSPEED);
+      }
+    }
     
     
     

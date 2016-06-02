@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 import java.util.Scanner;
 
 import gameobjects.HappyGame;
+import gameobjects.Player;
 
 public class Client
 {
@@ -19,16 +20,18 @@ public class Client
   private long startNanoSec;
   private Scanner keyboard;
   private ClientListener listener;
-
-  static HappyGame game;
+  public int screenWidth = 640;
+  public int screenHeight = 400;
+  Player player;
+//  HappyGame game;
 
   public Client(String host, int portNumber)
   {
     startNanoSec = System.nanoTime();
-    System.out.println("Starting Client: " + timeDiff());
+    System.out.println("Starting Client: " + System.nanoTime());
 
     keyboard = new Scanner(System.in);
-
+    
     while (!openConnection(host, portNumber))
     {
       
@@ -37,14 +40,19 @@ public class Client
     listener = new ClientListener();
     System.out.println("Client(): Starting listener = : " + listener);
     listener.start();
-
+    
+    HappyGame game = new HappyGame();
+//    game.addPlayer(false);
+    game.addPlayer(false);
+//    game.addPlayer(false);
+    (new Thread(game)).start();
+    
+    System.out.println("Number of Players: "+game.playerList.size());
     
     listenToUserRequests();
-
     closeAll();
 
   }
-  
   
   private boolean openConnection(String host, int portNumber)
   {
@@ -80,7 +88,7 @@ public class Client
     try
     {
       reader = new BufferedReader(new InputStreamReader(
-          clientSocket.getInputStream()));
+      clientSocket.getInputStream()));
     }
     catch (IOException e)
     {
@@ -91,6 +99,7 @@ public class Client
     return true;
 
   }
+  
   private void listenToUserRequests()
   {
     while (true)
@@ -101,7 +110,7 @@ public class Client
       if (cmd.length() < 1) continue;
 
       char c = cmd.charAt(0);
-      if (c == 'q') break;
+      if (c == 'q') System.exit(0);;
 
       write.println(cmd);
     }
@@ -141,7 +150,7 @@ public class Client
     
     String host = null;
     int port = 0;
-    game = new HappyGame();
+   
     
    
     try
@@ -156,28 +165,22 @@ public class Client
       System.exit(0);
     }
     
-//    System.out.println("new Client(host, port);");
-    new Client(host, port);
+    System.out.println("new Client(host, port);");
+    Client c = new Client(host, port);
     
     
 
   }
 
-  
-  
-  
   class ClientListener extends Thread
   {
     public void run()
     {
-      String[] a = new String[0];
-      game.play(a);
       System.out.println("ClientListener.run()");
       while (true)
       {
         read();
       }
-
     }
 
     private void read()
@@ -187,8 +190,7 @@ public class Client
 //        System.out.println("Client: listening to socket");
         String msg = reader.readLine();
         
-          System.out.println( timeDiff()
-              + ": " + msg);
+        System.out.println( timeDiff() + ": " + msg);
 
       }
       catch (IOException e)
@@ -198,5 +200,6 @@ public class Client
     }
 
   }
+
 
 }

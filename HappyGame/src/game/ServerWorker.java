@@ -41,7 +41,7 @@ public class ServerWorker extends Thread
   //Called by ServerMaster
   public void send(String msg)
   {
-    System.out.println("ServerWorker.send(" + msg + ")");
+//    System.out.println("ServerWorker.send(" + msg + ")");
     clientWriter.println(msg);
   }
 

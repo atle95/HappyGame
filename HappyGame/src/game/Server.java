@@ -18,6 +18,7 @@ public class Server
   private ServerSocket serverSocket;
   private LinkedList<ServerWorker> allConnections = new LinkedList<ServerWorker>();
   Random r = new Random();
+  HappyGame game;
 
   public Server(int portNumber)
   {
@@ -31,7 +32,7 @@ public class Server
       e.printStackTrace();
       System.exit(-1);
     }
-    HappyGame game = new HappyGame();
+    game = new HappyGame();
 
     waitForConnection(portNumber);
   }
@@ -56,9 +57,9 @@ public class Server
         Socket client = serverSocket.accept();
         ServerWorker worker = new ServerWorker(client);
         worker.start();
-        System.out.println("ServerMaster: *********** new Connection");
         allConnections.add(worker);
         worker.send("ServerMaster says hello!");
+        
         
       }
       catch (IOException e)
@@ -67,6 +68,7 @@ public class Server
         e.printStackTrace();
       }
 
+      broadcast("playerJoined at: "+System.nanoTime());
     }
   }
 

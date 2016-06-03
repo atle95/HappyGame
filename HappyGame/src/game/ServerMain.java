@@ -36,6 +36,7 @@ public class ServerMain extends Listener
     server.getKryo().register(PacketMessage.class);
     server.getKryo().register(UpdatePlayerX.class);
     server.getKryo().register(UpdatePlayerY.class);
+    server.getKryo().register(UpdatePlayerID.class);
     
     server.bind(port);
     server.addListener(new Listener()
@@ -43,24 +44,22 @@ public class ServerMain extends Listener
           @Override
           public void connected(Connection c)
           {
-            System.out.println("Sending Message from server");
-            PacketMessage pm = new PacketMessage();
-            pm.message = "Time: " + new Date().toString();
-            c.sendTCP(pm);
             connected++;
             System.out.println("Hi Lady! connected: "+ connected);
-            PlayerPacket playerPacket = new PlayerPacket();
             
-            PacketMessage packet = new PacketMessage();
-            packet.id = c.getID();
-            server.sendToAllExceptTCP(c.getID(), packet);
+            PacketMessage pm = new PacketMessage();
+            pm.message = "ServerMain: connected(Connection c)";
+            c.sendTCP(pm);
             
-//            for(Player p : game.getPlayerList()){
-//              PacketMessage msg = new PacketMessage();
-//              c.sendTCP(msg);
-//            }
+            UpdatePlayerID upid = new UpdatePlayerID();
+            upid.id = connected;
+            c.sendTCP(upid);
             
-            System.out.println("Connection received.");
+            
+//            PacketMessage packet = new PacketMessage();
+//            packet.id = c.getID();
+//            server.sendToAllExceptTCP(c.getID(), packet);
+            
           }
           
           @Override
@@ -69,7 +68,10 @@ public class ServerMain extends Listener
             if( o instanceof PacketMessage)
             {
               PacketMessage pm = (PacketMessage) o;
-//              System.out.println(pm.message);
+              System.out.println("From Client: [" + pm.message+"]");
+              // Infinite Communication Loop
+              // pm.message = "serverMain: received(Connection c, Object o)";
+              // c.sendTCP(pm);
             }
             if( o instanceof UpdatePlayerX)
             {
@@ -124,28 +126,23 @@ public class ServerMain extends Listener
       
 //      int playerx = serverPlayerX;
       UpdatePlayerX upx = new UpdatePlayerX();
-//      upx.x = playerx;
-      upx.x = upx.x+10;
+//      upx.x = game.getPlayerList().get(0).xpos;
       server.sendToAllTCP(upx);
       
 //      int playery = serverPlayerY;
 //      System.out.println(playery);
       UpdatePlayerY upy = new UpdatePlayerY();
 //      upy.y = playery;
-      upy.y = upy.y+10;
       server.sendToAllTCP(upy);
-      
-      game.getPlayerList().get(0).xpos+=1;
-      game.getPlayerList().get(0).ypos+=1;
       
     }
   };
   
   public static void main(String args[]) throws IOException, InterruptedException
   {
-    new ServerMain(port);
+    ServerMain s = new ServerMain(port);
     
-    game = new HappyGame();
+    game = new HappyGame(s);
     
     while(!messageRecieved)
     {

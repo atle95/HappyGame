@@ -40,6 +40,13 @@ public class HappyGame extends Application implements Runnable
   
   Scene gameScene;
   Scene startScene;
+  private ClientMain c;
+  
+  
+  public HappyGame(ServerMain s)
+  {
+    
+  }
   
   public HappyGame()
   {
@@ -89,6 +96,8 @@ public class HappyGame extends Application implements Runnable
         {
           element.tick();
         }
+//        c.clientPlayerX = playerList.get(0).xpos;
+//        c.clientPlayerY = playerList.get(0).ypos;
 //      for(Player p: playerList)
 //      {
 //      }
@@ -142,6 +151,11 @@ public class HappyGame extends Application implements Runnable
     return gameScene;
   }
 
+  public void setClient(ClientMain c)
+  {
+    this.c = c;
+  }
+
   @Override
   public void start(Stage primaryStage) throws Exception 
   {
@@ -154,5 +168,4 @@ public class HappyGame extends Application implements Runnable
     primaryStage.show();
     timer.start();
   }
-
 }

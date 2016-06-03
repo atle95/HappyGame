@@ -15,6 +15,7 @@ public class ClientMain extends Listener
 {
   //kryonet
   static Client client;
+  public int id;
   static int    port = 54555;
   static String host = "localhost";
   
@@ -34,16 +35,16 @@ public class ClientMain extends Listener
     client.getKryo().register(PacketMessage.class);
     client.getKryo().register(UpdatePlayerX.class);
     client.getKryo().register(UpdatePlayerY.class);
+    client.getKryo().register(UpdatePlayerID.class);
     client.addListener(new Listener()
         {
           @Override
           public void connected(Connection c)
           {
-            System.out.println("Sending Message from client");
             PacketMessage pm = new PacketMessage();
-            pm.message = "Time: " + new Date().toString();
+            pm.message = "Client: connected(Connection c)";
+//            System.out.println("Sending Message ["+pm.message+"] from client");
             c.sendTCP(pm); 
-            
           }
         
           @Override
@@ -53,19 +54,28 @@ public class ClientMain extends Listener
             {
               PacketMessage pm = (PacketMessage) o;
               System.out.println("From server: " + pm.message);
+              // endless loop
+              // pm.message = "Client Recieved Server Message";
+              // c.sendTCP(pm);
             }
             if( o instanceof UpdatePlayerX)
             {
               UpdatePlayerX pm = (UpdatePlayerX) o;
-              game.setPlayerPosition(1, pm.x, 0);
-              System.out.println("From server: " + pm.x);
+              game.getPlayerList().get(1).xpos = pm.x;
+//              System.out.println("From server: x " + pm.x);
             }
             if( o instanceof UpdatePlayerY)
             {
               
               UpdatePlayerY pm = (UpdatePlayerY) o;
-              game.setPlayerPosition(1, pm.y, 0);
-              System.out.println("From server: " + pm.y);
+              game.getPlayerList().get(1).ypos = pm.y;
+//              System.out.println("From server: y " + pm.y);
+            }
+            if( o instanceof UpdatePlayerID)
+            {
+              
+              UpdatePlayerID upid = (UpdatePlayerID) o;
+              id = upid.id;
             }
             messageRecieved = true;
           }
@@ -74,6 +84,9 @@ public class ClientMain extends Listener
           public void disconnected(Connection c)
           {
             System.out.println("Disconnected!");
+            PacketMessage m = new PacketMessage();
+            m.message = "Client Disconnected";
+            c.sendTCP(m);
           }
         });
     
@@ -94,14 +107,14 @@ public class ClientMain extends Listener
 //      client.sendTCP(pm);
       
       UpdatePlayerX upx = new UpdatePlayerX();
-      int playerx = game.getPlayerList().get(0).xpos;
+      int playerx = clientPlayerX;
       upx.x = playerx;
       client.sendTCP(upx);
       
       
 //      System.out.println(playery);
       UpdatePlayerY upy = new UpdatePlayerY();
-      int playery = game.getPlayerList().get(0).ypos;
+      int playery = clientPlayerY;
       upy.y = playery;
       client.sendTCP(upy);
       
@@ -114,6 +127,8 @@ public class ClientMain extends Listener
     ClientMain c = new ClientMain(host, port);
     
     game = new HappyGame();
+    game.setClient(c);
+    
     Thread t = new Thread(game);
     t.start();
     

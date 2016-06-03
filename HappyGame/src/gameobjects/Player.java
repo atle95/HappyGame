@@ -106,7 +106,7 @@ public class Player
 //      System.out.println(xpos+" "+ypos);
       if(wDown||aDown||sDown||dDown)
       {
-        System.out.println(getPosition());
+//        System.out.println(getPosition());
       }
     }
     

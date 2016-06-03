@@ -38,10 +38,10 @@ public class GamePolygon
 
   void tick()
   {
-    polygon.setRotate(randomIncrement);
+    polygon.setRotate(angle);
     polygon.setTranslateX(polygon.getTranslateX()+Math.cos(angle)*velocity);
     polygon.setTranslateY(polygon.getTranslateY()+Math.sin(angle)*velocity);
     
-    randomIncrement+=1;
+    angle+=0.01;
   }
 }

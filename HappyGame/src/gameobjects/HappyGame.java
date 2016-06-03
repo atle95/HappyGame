@@ -3,6 +3,8 @@ package gameobjects;
 import java.util.ArrayList;
 import java.util.Random;
 
+import game.ClientMain;
+import game.ServerMain;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -17,25 +19,31 @@ import javafx.stage.Stage;
 public class HappyGame extends Application implements Runnable
 {
   
-//  Player player;
   ArrayList<GamePolygon> gamePolyList = new ArrayList<>();
-  public ArrayList<Player> playerList = new ArrayList<>();
+  private ArrayList<Player> playerList = new ArrayList<>();
+  
   Canvas background = new Canvas(1280, 800);
+  GraphicsContext gfx = background.getGraphicsContext2D();
+//  StackPane pane;
+  
 //  GraphicsContext gfx = background.getGraphicsContext2D();
   StackPane pane = new StackPane();
   public boolean paused = false;
   Random r = new Random();
-  public int screenWidth = 1280;
-  public int screenHeight = 800;
+  
+  public int screenWidth = 640;
+  public int screenHeight = 400;
+
+
   int currentPlayers = 0;
   int pendingPlayers = 0;
+  
   Scene gameScene;
   Scene startScene;
   
   public HappyGame()
   {
-    pane.getChildren().add(background);
-    
+    pane = new StackPane(background);
     for (int i = 0; i<20; i++)
     {
       GamePolygon gamePolygon = new GamePolygon(r.nextInt(14)+4, r.nextInt(4), r.nextInt(20)+10, r.nextDouble(), r.nextDouble()*2*Math.PI);
@@ -45,21 +53,28 @@ public class HappyGame extends Application implements Runnable
       gamePolyList.add(gamePolygon);
     }
     
-    addPlayer(true);
-    addPlayer(false);
-//    Player player = new Player(this, true);
-//    playerList.add(player);
-    for(Player p: playerList)
+    for(int i = 0; i<4; i++)
     {
-      Polygon[] polyList = p.getPentagonList();
+      Player player;
+      if(i==0)
+      {
+        player = new Player(true, this);
+      }
+      else
+      {
+        player = new Player(true, this);
+      }
+      player.xpos +=i*50;
+      player.ypos +=i*50;
+      playerList.add(player);
+      Polygon[] polyList = player.getPentagonList();
       pane.getChildren().addAll(polyList[4], polyList[0], polyList[1], polyList[2], polyList[3]);
     }
 
-    timer.start();
-//    System.out.println("happyGame Constructor ends");
   }
   
-  AnimationTimer timer = new AnimationTimer()
+  
+  public AnimationTimer timer = new AnimationTimer()
   {
     @Override
     public void handle(long now) 
@@ -74,11 +89,16 @@ public class HappyGame extends Application implements Runnable
         {
           element.tick();
         }
+//      for(Player p: playerList)
+//      {
+//      }
 //        gfx.setFill(Color.BLACK);
 //        gfx.fillRect(player.xpos+screenWidth/2-player.radius/2, player.ypos+screenHeight/2-player.radius/2, 20, 20);
       }
     }
   };
+  public int xpos;
+  public int ypos;
   
   public StackPane getStackPane()
   {
@@ -90,19 +110,23 @@ public class HappyGame extends Application implements Runnable
     this.pane = pane;
   }
   
+  public void setPlayerPosition(int plr, int x, int y)
+  {
+    playerList.get(plr).xpos = x;
+    playerList.get(plr).ypos = y;
+  }
+  
   public void addPlayer(Boolean clientPlayer)
   {
-    Player newPlayer = new Player(this, clientPlayer);
+    Player newPlayer = new Player(clientPlayer, this);
     playerList.add(newPlayer);
     Polygon[] polyList = newPlayer.getPentagonList();
     newPlayer.tick();
   }
   
-  public short getPlayerControl()
+  public ArrayList<Player> getPlayerList()
   {
-//    System.out.println(playerList.get(0).getControls());
-    return playerList.get(0).getControls();
-    
+    return playerList;
   }
   
   //Quick workaround to not kill the rest of the program
@@ -112,11 +136,15 @@ public class HappyGame extends Application implements Runnable
     String[] a = new String[0];
     launch(a);
   }
+  
+  public Scene getScene()
+  {
+    return gameScene;
+  }
 
   @Override
   public void start(Stage primaryStage) throws Exception 
   {
-    
     gameScene = new Scene(pane, screenWidth, screenHeight);
     gameScene.addEventHandler(KeyEvent.KEY_PRESSED,  new KeyboardEventHandler(playerList.get(0)));
     gameScene.addEventHandler(KeyEvent.KEY_RELEASED, new KeyboardEventHandler(playerList.get(0)));
@@ -124,6 +152,7 @@ public class HappyGame extends Application implements Runnable
     startScene = new Scene(new StackPane(), screenWidth, screenHeight);
     primaryStage.setScene(gameScene);
     primaryStage.show();
+    timer.start();
   }
 
 }

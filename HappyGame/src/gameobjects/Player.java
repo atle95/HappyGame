@@ -6,12 +6,12 @@ import javafx.scene.shape.Polygon;
 
 public class Player
 {
-  public static final Double WALKINGSPEED = 10.0;
+  public static final int WALKINGSPEED = 5;
   public Polygon polyArr[] = new Polygon[5];
   int layoutDistance = 40;
   boolean opening = true;
   private int openingSpeed = 3;
-  int radius;
+  public int radius;
 
   public Boolean shiftPressed;
   public Boolean wDown = false;
@@ -23,14 +23,14 @@ public class Player
   public double rotateLeft = 0;
   double rotateSpeed = 10;
   
-  double xpos;
-  double ypos;
+  public int xpos = 0;
+  public int ypos = 0;
   Double [] pentagonLayout;
   
-  HappyGame game;
+  public HappyGame game;
   public boolean isClientPlayer;
   
-  Player(HappyGame game, boolean isClientPlayer)
+  public Player(boolean isClientPlayer, HappyGame game)
   {
     this.isClientPlayer = isClientPlayer;
     this.game = game;
@@ -70,6 +70,8 @@ public class Player
     polyArr[2].setTranslateY(layoutDistance);
     polyArr[2].setTranslateX(layoutDistance);
     polyArr[3].setTranslateY(layoutDistance);
+    
+    
   }
   
   Polygon[] getPentagonList()
@@ -92,7 +94,6 @@ public class Player
     
     if(isClientPlayer)
     {
-    
       if(wDown){ypos-= WALKINGSPEED;}
       if(aDown){xpos-= WALKINGSPEED;}
       if(sDown){ypos+= WALKINGSPEED;}
@@ -102,6 +103,11 @@ public class Player
       if(aDown){pane.setTranslateX(pane.getTranslateX()+WALKINGSPEED);}
       if(sDown){pane.setTranslateY(pane.getTranslateY()-WALKINGSPEED);}
       if(dDown){pane.setTranslateX(pane.getTranslateX()-WALKINGSPEED);}
+//      System.out.println(xpos+" "+ypos);
+      if(wDown||aDown||sDown||dDown)
+      {
+        System.out.println(getPosition());
+      }
     }
     
     
@@ -113,7 +119,7 @@ public class Player
       {
         rotateRight -= rotateSpeed;
         polyArr[i].setRotate(polyArr[i].getRotate()+rotateSpeed);
-        polyArr[i].setTranslateX(Math.cos(polyArr[i].getRotate()*Math.PI/180-Math.PI*3/4)*layoutDistance+xpos);
+        polyArr[i].setTranslateX(Math.cos(polyArr[i].getRotate()*Math.PI/180-Math.PI*3/4)*layoutDistance+getXpos());
         polyArr[i].setTranslateY(Math.sin(polyArr[i].getRotate()*Math.PI/180-Math.PI*3/4)*layoutDistance+ypos);
       }
     }
@@ -123,7 +129,7 @@ public class Player
       {
         rotateLeft -= rotateSpeed;
         polyArr[i].setRotate(polyArr[i].getRotate()-rotateSpeed);
-        polyArr[i].setTranslateX(Math.cos(polyArr[i].getRotate()*Math.PI/180-Math.PI*3/4)*layoutDistance+xpos);
+        polyArr[i].setTranslateX(Math.cos(polyArr[i].getRotate()*Math.PI/180-Math.PI*3/4)*layoutDistance+getXpos());
         polyArr[i].setTranslateY(Math.sin(polyArr[i].getRotate()*Math.PI/180-Math.PI*3/4)*layoutDistance+ypos);
       }
     }
@@ -131,11 +137,11 @@ public class Player
     {
       for(int i = 0; i < polyArr.length-1; i++)
       {
-        polyArr[i].setTranslateX(Math.cos(polyArr[i].getRotate()*Math.PI/180-Math.PI*3/4)*layoutDistance+xpos);
+        polyArr[i].setTranslateX(Math.cos(polyArr[i].getRotate()*Math.PI/180-Math.PI*3/4)*layoutDistance+getXpos());
         polyArr[i].setTranslateY(Math.sin(polyArr[i].getRotate()*Math.PI/180-Math.PI*3/4)*layoutDistance+ypos);
       }
     }
-    polyArr[4].setTranslateX(xpos);
+    polyArr[4].setTranslateX(getXpos());
     polyArr[4].setTranslateY(ypos);
   }
   
@@ -146,5 +152,40 @@ public class Player
       if(sDown){control ^= 0x20;}
       if(dDown){control ^= 0x10;}
       return control;
+  }
+  
+  public String getPosition()
+  {
+    return getXpos()+" "+getYpos()+"\n";
+  }
+  
+  public HappyGame getGame()
+  {
+    return game;
+  }
+
+  public void setGame(HappyGame game)
+  {
+    this.game = game;
+  }
+
+  public int getXpos()
+  {
+    return xpos;
+  }
+
+  public void setXpos(int xpos)
+  {
+    this.xpos = xpos;
+  }
+  
+  public int getYpos()
+  {
+    return ypos;
+  }
+  
+  public void setYpos(int ypos)
+  {
+    this.ypos = ypos;
   }
 }

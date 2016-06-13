@@ -31,8 +31,10 @@ public class HappyGame extends Application implements Runnable
   public boolean paused = false;
   Random r = new Random();
   
-  public int screenWidth = 640;
-  public int screenHeight = 400;
+//  public int screenWidth = 640;
+//  public int screenHeight = 400;
+  public int screenWidth = 1280;
+  public int screenHeight = 800;
 
 
   int currentPlayers = 0;
@@ -40,17 +42,18 @@ public class HappyGame extends Application implements Runnable
   
   Scene gameScene;
   Scene startScene;
-  private ClientMain c;
   
+  ClientMain c;
+  ServerMain serverMain;
   
-  public HappyGame(ServerMain s)
-  {
-    
-  }
+  Player playerone;
+  private EntityManager entityManager;
+  
   
   public HappyGame()
   {
     pane = new StackPane(background);
+    
     for (int i = 0; i<20; i++)
     {
       GamePolygon gamePolygon = new GamePolygon(r.nextInt(14)+4, r.nextInt(4), r.nextInt(20)+10, r.nextDouble(), r.nextDouble()*2*Math.PI);
@@ -65,22 +68,39 @@ public class HappyGame extends Application implements Runnable
       Player player;
       if(i==0)
       {
-        player = new Player(true, this);
+        playerone = new Player(true, this);
+        playerList.add(playerone);
+        Polygon[] polyList = playerone.getPentagonList();
+        pane.getChildren().addAll(polyList[4], polyList[0], polyList[1], polyList[2], polyList[3]);
       }
       else
       {
-        player = new Player(true, this);
+        player = new Player(false, this);
+        player.xpos +=i*50;
+        player.ypos +=i*50;
+        playerList.add(player);
+        Polygon[] polyList = player.getPentagonList();
+        pane.getChildren().addAll(polyList[4], polyList[0], polyList[1], polyList[2], polyList[3]);
       }
-      player.xpos +=i*50;
-      player.ypos +=i*50;
-      playerList.add(player);
-      Polygon[] polyList = player.getPentagonList();
-      pane.getChildren().addAll(polyList[4], polyList[0], polyList[1], polyList[2], polyList[3]);
     }
+    
 
   }
   
   
+  public HappyGame(ServerMain serverMain)
+  {
+    this.serverMain = serverMain;
+  }
+
+  public HappyGame(EntityManager entityManager)
+  {
+    this.entityManager = entityManager;
+    playerList = entityManager.playerList;
+    gamePolyList = entityManager.gameStuff;
+  }
+
+
   public AnimationTimer timer = new AnimationTimer()
   {
     @Override
@@ -96,6 +116,8 @@ public class HappyGame extends Application implements Runnable
         {
           element.tick();
         }
+//        entityManager.tick();
+//       System.out.println( "playerList.get(0).xpos "+playerList.get(0).xpos);
 //        c.clientPlayerX = playerList.get(0).xpos;
 //        c.clientPlayerY = playerList.get(0).ypos;
 //      for(Player p: playerList)
@@ -106,8 +128,6 @@ public class HappyGame extends Application implements Runnable
       }
     }
   };
-  public int xpos;
-  public int ypos;
   
   public StackPane getStackPane()
   {
@@ -129,13 +149,18 @@ public class HappyGame extends Application implements Runnable
   {
     Player newPlayer = new Player(clientPlayer, this);
     playerList.add(newPlayer);
-    Polygon[] polyList = newPlayer.getPentagonList();
+//    Polygon[] polyList = newPlayer.getPentagonList();
     newPlayer.tick();
   }
   
   public ArrayList<Player> getPlayerList()
   {
     return playerList;
+  }
+  
+  public Player getPlayer()
+  {
+    return playerList.get(0);
   }
   
   //Quick workaround to not kill the rest of the program
@@ -151,11 +176,6 @@ public class HappyGame extends Application implements Runnable
     return gameScene;
   }
 
-  public void setClient(ClientMain c)
-  {
-    this.c = c;
-  }
-
   @Override
   public void start(Stage primaryStage) throws Exception 
   {
@@ -167,5 +187,25 @@ public class HappyGame extends Application implements Runnable
     primaryStage.setScene(gameScene);
     primaryStage.show();
     timer.start();
+   
   }
+
+  public void setClient(ClientMain c) 
+  {
+    this.c = c;    
+    c.setClientPlayerX(playerList.get(0).xpos);
+    c.setClientPlayerY(playerList.get(0).ypos);
+    c.startTimer();
+  }
+  
+  public int getPlayerX()
+  {
+    return this.getPlayerList().get(0).xpos;
+  }
+
+  public int getPlayerY()
+  {
+    return this.getPlayerList().get(0).ypos;
+  }
+
 }

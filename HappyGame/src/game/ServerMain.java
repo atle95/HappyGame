@@ -120,7 +120,6 @@ public class ServerMain extends Listener
       Connection[] list = server.getConnections();
       for(Connection element: list)
       {
-      //server.getConnections()
         element.sendTCP(pm);
       }
       

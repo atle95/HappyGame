@@ -7,6 +7,7 @@ import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 
+import gameobjects.EntityManager;
 import gameobjects.HappyGame;
 import gameobjects.Player;
 import javafx.animation.AnimationTimer;
@@ -22,8 +23,8 @@ public class ClientMain extends Listener
   private long startNanoSec;
   public int screenWidth = 640;
   public int screenHeight = 400;
-  public int clientPlayerX;
-  public int clientPlayerY;
+  public int clientPlayerX = 0;
+  public int clientPlayerY = 0;
 
   static HappyGame game;
   
@@ -36,6 +37,7 @@ public class ClientMain extends Listener
     client.getKryo().register(UpdatePlayerX.class);
     client.getKryo().register(UpdatePlayerY.class);
     client.getKryo().register(UpdatePlayerID.class);
+    
     client.addListener(new Listener()
         {
           @Override
@@ -61,14 +63,12 @@ public class ClientMain extends Listener
             if( o instanceof UpdatePlayerX)
             {
               UpdatePlayerX pm = (UpdatePlayerX) o;
-              game.getPlayerList().get(1).xpos = pm.x;
 //              System.out.println("From server: x " + pm.x);
             }
             if( o instanceof UpdatePlayerY)
             {
               
               UpdatePlayerY pm = (UpdatePlayerY) o;
-              game.getPlayerList().get(1).ypos = pm.y;
 //              System.out.println("From server: y " + pm.y);
             }
             if( o instanceof UpdatePlayerID)
@@ -89,16 +89,14 @@ public class ClientMain extends Listener
             c.sendTCP(m);
           }
         });
-    
-//    new Thread(client).start();
+
     client.start();
     client.connect(5000, host, port);
-//    startNanoSec = System.nanoTime();
-    timer.start();
   }
   
   AnimationTimer timer = new AnimationTimer()
   {
+    int counter = 0;
     @Override
     public void handle(long now) 
     {
@@ -118,23 +116,44 @@ public class ClientMain extends Listener
       upy.y = playery;
       client.sendTCP(upy);
       
+      counter++;
+      game.setPlayerPosition(1, 20, 20);
       
+//      System.out.printf("Player x: %d, Player y: %d\n", game.getPlayerX(), game.getPlayerY());
     }
   };
  
   public static void main(String[] args) throws IOException, InterruptedException
   {
     ClientMain c = new ClientMain(host, port);
+    EntityManager em = new EntityManager(c);
+    game = new HappyGame(em);
     
-    game = new HappyGame();
-    game.setClient(c);
+    Thread gameThread = new Thread(game);
+    //bind properties here
     
-    Thread t = new Thread(game);
-    t.start();
+    gameThread.start();
+    
     
     while(!messageRecieved)
     {
       Thread.sleep(1000);
     }
   }
+
+  public void startTimer()
+  {
+    timer.start();    
+  }
+
+  public void setClientPlayerX(int xpos)
+  {
+    this.clientPlayerX = xpos;
+  }
+  
+  public void setClientPlayerY(int ypos)
+  {
+    this.clientPlayerY = ypos;
+  }
+
 }
